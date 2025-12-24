@@ -1,0 +1,3 @@
+# This file ensures the saved_models directory is tracked by git
+# Model checkpoints (*.pth files) are excluded via .gitignore
+

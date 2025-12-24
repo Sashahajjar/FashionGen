@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Model checkpoints (large files, don't commit)
+saved_models/*.pth
+saved_models/*.pkl
+!saved_models/.gitkeep
+
+# Data directories (optional - uncomment if you don't want to commit data)
+# data/images/*
+# data/captions/*
+# data/processed/*
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+
