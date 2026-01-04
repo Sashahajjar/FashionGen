@@ -1,23 +1,20 @@
 """
-RNN Model for Fashion Text Feature Extraction
+RNN Model for Text Feature Extraction
 
-This module implements an RNN (LSTM/GRU) that extracts features from fashion
-text descriptions. Currently works with mock data (random token ids).
-Real Fashion-Gen caption loading will be integrated later.
+This module implements an RNN (LSTM/GRU) that extracts features from
+text captions using bidirectional LSTM/GRU.
 """
 
 import torch
 import torch.nn as nn
 
 
-class FashionRNN(nn.Module):
+class TextRNN(nn.Module):
     """
-    RNN model for extracting features from fashion text descriptions.
+    RNN model for extracting features from text captions.
     
     Input: Token IDs of shape (B, seq_len) and lengths of shape (B,)
     Output: Feature vectors of shape (B, feature_dim)
-    
-    TODO: Replace mock data with real Fashion-Gen caption loading
     """
     
     def __init__(
@@ -42,13 +39,12 @@ class FashionRNN(nn.Module):
             rnn_type: Type of RNN ('LSTM' or 'GRU')
             dropout: Dropout probability
         """
-        super(FashionRNN, self).__init__()
+        super(TextRNN, self).__init__()
         self.hidden_dim = hidden_dim
         self.num_layers = num_layers
         self.rnn_type = rnn_type
         
         # Embedding layer
-        # TODO: Replace with Fashion-Gen specific vocabulary
         self.embedding = nn.Embedding(vocab_size, embedding_dim)
         
         # RNN layer
@@ -82,11 +78,7 @@ class FashionRNN(nn.Module):
         
         Args:
             token_ids: Tensor of shape (B, seq_len) containing token IDs
-                     Currently accepts random token IDs for mock data
-                     TODO: Replace with real Fashion-Gen caption tokens
             lengths: Tensor of shape (B,) containing actual sequence lengths
-                    Currently accepts random lengths for mock data
-                    TODO: Replace with real Fashion-Gen caption lengths
         
         Returns:
             features: Tensor of shape (B, feature_dim)
@@ -144,9 +136,9 @@ def create_rnn_model(
         dropout: Dropout probability
     
     Returns:
-        FashionRNN model instance
+        TextRNN model instance
     """
-    return FashionRNN(
+    return TextRNN(
         vocab_size=vocab_size,
         embedding_dim=embedding_dim,
         hidden_dim=hidden_dim,

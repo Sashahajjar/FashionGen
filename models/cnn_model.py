@@ -1,9 +1,8 @@
 """
-CNN Model for Fashion Image Feature Extraction
+CNN Model for Image Feature Extraction
 
-This module implements a CNN that extracts visual features from fashion images.
-Currently works with mock data (random tensors). Real Fashion-Gen image loading
-will be integrated later.
+This module implements a CNN that extracts visual features from images.
+Uses ResNet50 as backbone for feature extraction.
 """
 
 import torch
@@ -12,14 +11,12 @@ import torchvision.models as models
 from torchvision.models import ResNet50_Weights
 
 
-class FashionCNN(nn.Module):
+class ImageCNN(nn.Module):
     """
-    CNN model for extracting features from fashion images.
+    CNN model for extracting features from images.
     
     Input: Image tensors of shape (B, 3, 224, 224)
     Output: Feature vectors of shape (B, feature_dim)
-    
-    TODO: Replace mock data with real Fashion-Gen image loading
     """
     
     def __init__(self, feature_dim=512, pretrained=True):
@@ -30,11 +27,10 @@ class FashionCNN(nn.Module):
             feature_dim: Dimension of the output feature vector
             pretrained: Whether to use pretrained weights
         """
-        super(FashionCNN, self).__init__()
+        super(ImageCNN, self).__init__()
         self.feature_dim = feature_dim
         
         # Use ResNet50 as backbone (can be changed to other architectures)
-        # TODO: Replace with Fashion-Gen specific architecture if needed
         if pretrained:
             resnet = models.resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
         else:
@@ -53,8 +49,6 @@ class FashionCNN(nn.Module):
         
         Args:
             images: Tensor of shape (B, 3, 224, 224)
-                   Currently accepts random tensors for mock data
-                   TODO: Replace with real Fashion-Gen images
         
         Returns:
             features: Tensor of shape (B, feature_dim)
@@ -82,7 +76,7 @@ def create_cnn_model(feature_dim=512, pretrained=True):
         pretrained: Whether to use pretrained weights
     
     Returns:
-        FashionCNN model instance
+        ImageCNN model instance
     """
-    return FashionCNN(feature_dim=feature_dim, pretrained=pretrained)
+    return ImageCNN(feature_dim=feature_dim, pretrained=pretrained)
 

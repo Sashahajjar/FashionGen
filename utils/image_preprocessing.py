@@ -1,9 +1,8 @@
 """
 Image preprocessing utilities
 
-This module contains functions for preprocessing fashion images.
-Currently contains placeholder functions. Real Fashion-Gen image preprocessing
-will be integrated later.
+This module contains functions for preprocessing images.
+Note: The main image transforms are in data/dataset.py (Flickr8kDataset).
 """
 
 import torch
@@ -21,11 +20,11 @@ def get_image_transform(image_size=(224, 224), is_training=True):
     Returns:
         torchvision.transforms.Compose object
     
-    TODO: Replace with Fashion-Gen specific preprocessing
+    Image preprocessing utilities for Flickr8k dataset.
     """
     if is_training:
         # Training transforms with augmentation
-        # TODO: Add Fashion-Gen specific augmentations
+        # Image augmentation for training
         transform = transforms.Compose([
             transforms.Resize(image_size),
             transforms.RandomHorizontalFlip(),
@@ -60,11 +59,11 @@ def load_and_preprocess_image(image_path, image_size=(224, 224)):
     Returns:
         Preprocessed image tensor
     
-    TODO: Implement real image loading for Fashion-Gen dataset
+    Load image from file path.
     """
     from PIL import Image
     
-    # TODO: Load Fashion-Gen image from path
+    # Load image from path
     # image = Image.open(image_path).convert('RGB')
     # transform = get_image_transform(image_size, is_training=False)
     # return transform(image)

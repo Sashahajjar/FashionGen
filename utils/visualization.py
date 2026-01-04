@@ -2,7 +2,7 @@
 Visualization utilities
 
 This module contains functions for visualizing model outputs, training progress,
-and Fashion-Gen data samples.
+and Flickr8k data samples.
 """
 
 import matplotlib.pyplot as plt
@@ -19,9 +19,9 @@ def visualize_batch(images, captions=None, num_samples=4):
         captions: Optional list of caption strings
         num_samples: Number of samples to visualize
     
-    TODO: Add Fashion-Gen specific visualization (e.g., show retrieved items).
+    TODO: Add Flickr8k specific visualization.
     """
-    # TODO: Implement visualization for Fashion-Gen images and captions
+    # TODO: Implement visualization for Flickr8k images and captions
     # For now, this is a placeholder
     pass
 

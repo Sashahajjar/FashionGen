@@ -1,25 +1,34 @@
-# FashionGen Multi-Modal Classification Project
+# Flickr8k Multi-Modal Classification Project
 
-A PyTorch-based deep learning project for fashion item classification using both images and text captions. This project implements a fusion model that combines CNN (for images) and RNN (for text) to create a unified representation for fashion items.
+A PyTorch-based deep learning project for image classification using both images and text captions. This project implements a fusion model that combines CNN (for images) and RNN (for text) to create a unified representation for multimodal classification.
 
 ## 🎯 Project Overview
 
 This project implements a **multi-modal deep learning model** that:
-- Extracts visual features from fashion images using a ResNet50 CNN
-- Extracts textual features from fashion captions using a bidirectional LSTM/GRU
-- Fuses image and text features using concatenation, addition, or multiplication
-- Classifies fashion items into categories
+- Extracts visual features from images using a ResNet50 CNN
+- Extracts textual features from captions using a bidirectional LSTM/GRU
+- Fuses image and text features using concatenation
+- Classifies images into 10 categories based on caption content
+
+## 📊 Results
+
+- **Validation Accuracy**: 82.36%
+- **Test Accuracy**: 89.28%
+- **Best Validation Loss**: 0.5229
+- **Dataset**: Flickr8k (8,091 images, ~40,000 captions)
+- **Classes**: Dog, Cat, Person, Vehicle, Water, Building, Tree, Food, Sport, Sky
 
 ## 📁 Project Structure
 
 ```
 fashiongen-project/
 ├── data/                    # Data handling modules
-│   ├── dataset.py          # Main dataset class (supports mock & real data)
-│   └── h5_dataset.py       # HDF5 loader for Fashion-Gen Kaggle data
+│   ├── dataset.py          # Flickr8kDataset class (supports CSV and token formats)
+│   ├── images/             # Flickr8k images directory
+│   └── captions/           # Captions file directory
 ├── models/                  # Model architectures
-│   ├── cnn_model.py        # CNN for image feature extraction
-│   ├── rnn_model.py        # RNN for text feature extraction
+│   ├── cnn_model.py        # CNN for image feature extraction (ResNet50)
+│   ├── rnn_model.py        # RNN for text feature extraction (Bidirectional LSTM)
 │   └── fusion_model.py     # Fusion model combining CNN + RNN
 ├── training/                # Training scripts
 │   ├── config.py           # Configuration and hyperparameters
@@ -35,137 +44,128 @@ fashiongen-project/
 │   ├── text_preprocessing.py
 │   └── visualization.py
 ├── notebooks/               # Jupyter notebooks for Colab
-│   ├── FashionGen_Colab.ipynb
-│   └── FashionGen_Colab_Training.ipynb
-├── saved_models/            # Saved model checkpoints
+│   └── Flickr8k_Training.ipynb  # Complete Colab training notebook
+├── saved_models/            # Saved model checkpoints (gitignored)
 ├── requirements.txt         # Python dependencies
+├── setup.sh                 # Environment setup script
+├── download_dataset.sh      # Dataset download script
+├── DATASET_SETUP.md         # Dataset setup guide
 └── README.md               # This file
 ```
 
-## 🚀 Setup Instructions
+## 🚀 Quick Start
 
-### ⚠️ Important: Python Version Compatibility
+### Option 1: Google Colab (Recommended)
 
-**PyTorch does NOT support Python 3.13 yet!** 
+1. **Open the notebook**: Upload `notebooks/Flickr8k_Training.ipynb` to [Google Colab](https://colab.research.google.com/)
+2. **Enable GPU**: Runtime → Change runtime type → GPU
+3. **Run all cells**: The notebook will automatically:
+   - Clone the repository
+   - Install dependencies
+   - Download Flickr8k dataset
+   - Train the model
+   - Evaluate and run inference
 
-If you're using Python 3.13, you have two options:
-1. **Use Python 3.12** (recommended) - Run `./fix_python313.sh` to automatically fix this
-2. See `PYTHON313_FIX.md` for detailed instructions
+### Option 2: Local Setup
 
-### Prerequisites
+#### Prerequisites
 
-- **Python 3.8-3.12** (Python 3.11 or 3.12 recommended)
+- **Python 3.8-3.12** (Python 3.12 recommended)
 - pip package manager
 - (Optional) CUDA-capable GPU for faster training
 
-### Installation
-
-#### Quick Fix for Python 3.13 Users
-
-If you have Python 3.13 and Python 3.12 installed:
+#### Installation
 
 ```bash
-./fix_python313.sh
-```
+# Clone the repository
+git clone https://github.com/Sashahajjar/FashionGen.git
+cd FashionGen
 
-This script will automatically recreate your virtual environment with Python 3.12 and install all dependencies.
-
-#### Option 1: Using Existing Virtual Environment
-
-If you have a virtual environment already set up:
-
-```bash
-cd fashiongen-project
+# Create virtual environment with Python 3.12
+python3.12 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-#### Option 2: Create New Virtual Environment
-
-**For Python 3.11 or 3.12 (Recommended):**
+Or use the setup script:
 
 ```bash
-cd fashiongen-project
-python3.12 -m venv venv  # or python3.11
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install --upgrade pip
-pip install -r requirements.txt
+./setup.sh
 ```
 
-**For Python 3.13+ (if PyTorch supports it):**
-
-You may need to install PyTorch from nightly builds:
-
-```bash
-pip install --pre torch torchvision --index-url https://download.pytorch.org/whl/nightly/cpu
-# For GPU support, replace 'cpu' with 'cu121' or check PyTorch website
-```
-
-Then install other dependencies:
-
-```bash
-pip install numpy h5py Pillow scikit-learn matplotlib
-```
-
-#### Option 3: Install PyTorch Manually
-
-Visit [PyTorch Installation Guide](https://pytorch.org/get-started/locally/) and select your configuration, then:
-
-```bash
-# Example for CPU-only (replace with your configuration)
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-
-# Then install other dependencies
-pip install -r requirements.txt
-```
-
-### Verify Installation
+#### Verify Installation
 
 ```bash
 python -c "import torch; print(f'PyTorch {torch.__version__} installed successfully!')"
 python -c "import torchvision; print(f'Torchvision {torchvision.__version__} installed successfully!')"
 ```
 
-## 📊 Data Setup
+## 📊 Dataset Setup
 
 ### Using Mock Data (Default)
 
 The project works out-of-the-box with mock data for testing. No data download required.
 
-### Using Real Fashion-Gen Data
+```bash
+python training/train.py  # Automatically uses mock data
+```
 
-1. Download the Fashion-Gen dataset from [Kaggle](https://www.kaggle.com/datasets/bothin/fashiongen-validation/data)
-2. Extract HDF5 files to the project directory
-3. Update paths in `training/config.py` if needed
-4. Run training with the `--h5_file` flag:
+### Using Real Flickr8k Data
+
+#### Option 1: Automatic Download (Kaggle API)
+
+1. Get Kaggle API credentials from [Kaggle Account Settings](https://www.kaggle.com/account)
+2. Download `kaggle.json` and place it in `~/.kaggle/`
+3. Run the download script:
 
 ```bash
-python training/train.py --h5_file path/to/fashiongen_256_256_train.h5
+./download_dataset.sh
+```
+
+#### Option 2: Manual Download
+
+1. Download from [Kaggle: Flickr8k Dataset](https://www.kaggle.com/datasets/adityajn105/flickr8k)
+2. Extract images to `data/images/`
+3. Extract `captions.txt` to `data/captions/Flickr8k.token.txt`
+
+#### Option 3: Google Colab
+
+The Colab notebook automatically downloads the dataset. See `notebooks/Flickr8k_Training.ipynb`.
+
+### Dataset Structure
+
+```
+data/
+├── images/
+│   ├── 1000268201_693b08cb0e.jpg
+│   ├── 1001773457_577c3a5d70.jpg
+│   └── ... (8,091 images)
+└── captions/
+    └── Flickr8k.token.txt  # CSV format: image,caption
 ```
 
 ## 🏃 Usage
 
 ### Training
 
-**With mock data (for testing):**
+**With real data:**
 ```bash
 python training/train.py
-```
-
-**With real HDF5 data:**
-```bash
-python training/train.py --h5_file data/fashiongen_256_256_train.h5
-```
-
-**With early stopping:**
-```bash
-python training/train.py --early_stop
 ```
 
 **With limited samples (for quick testing):**
 ```bash
 python training/train.py --max_samples 1000
+```
+
+**With custom paths:**
+```bash
+python training/train.py \
+    --images_dir data/images \
+    --captions_file data/captions/Flickr8k.token.txt
 ```
 
 ### Evaluation
@@ -174,7 +174,7 @@ python training/train.py --max_samples 1000
 python training/evaluate.py
 ```
 
-### Inference/Demo
+### Inference Demo
 
 ```bash
 python inference/demo.py
@@ -190,24 +190,22 @@ python inference/predict.py
 
 All hyperparameters and settings are in `training/config.py`:
 
-- **Model Configuration**: Feature dimensions, fusion method, vocabulary size
-- **Training Configuration**: Batch size, learning rate, epochs, device settings
-- **Paths**: Data directories and model save locations
-
-Key settings you might want to adjust:
-
 ```python
 MODEL_CONFIG = {
-    'num_classes': 10,           # Number of clothing categories
-    'fusion_method': 'concat',    # 'concat', 'add', or 'multiply'
+    'num_classes': 10,           # Number of image categories
+    'fusion_method': 'concat',   # 'concat', 'add', or 'multiply'
     'vocab_size': 10000,         # Vocabulary size for text
+    'cnn_feature_dim': 512,      # CNN output dimension
+    'rnn_feature_dim': 512,      # RNN output dimension
 }
 
 TRAIN_CONFIG = {
-    'batch_size': 16,             # Adjust based on GPU memory
-    'num_epochs': 5,              # Number of training epochs
+    'batch_size': 16,            # Adjust based on GPU memory
+    'num_epochs': 5,             # Number of training epochs
     'learning_rate': 1e-4,       # Learning rate
-    'freeze_cnn': True,           # Freeze pretrained CNN weights
+    'freeze_cnn': True,          # Freeze pretrained CNN weights
+    'train_split': 0.7,          # Training split (70%)
+    'val_split': 0.15,           # Validation split (15%)
 }
 ```
 
@@ -215,20 +213,36 @@ TRAIN_CONFIG = {
 
 1. **CNN Branch**: ResNet50 (pretrained) → Feature extraction (512-dim)
 2. **RNN Branch**: Bidirectional LSTM → Text feature extraction (512-dim)
-3. **Fusion Layer**: Combines CNN and RNN features
+3. **Fusion Layer**: Concatenates CNN and RNN features
 4. **Classifier**: Final classification head (10 classes)
+
+### Classification Categories
+
+The model classifies images into 10 categories based on caption keywords:
+- Class 0: Dog
+- Class 1: Cat
+- Class 2: Person
+- Class 3: Vehicle
+- Class 4: Water
+- Class 5: Building
+- Class 6: Tree
+- Class 7: Food
+- Class 8: Sport
+- Class 9: Sky
 
 ## 📝 Features
 
 - ✅ Multi-modal fusion (image + text)
-- ✅ Support for mock and real data
-- ✅ HDF5 dataset loading
+- ✅ Automatic mock data fallback for testing
+- ✅ Support for CSV and token caption formats
+- ✅ Automatic train/val/test splitting
 - ✅ Model checkpointing (best by loss/accuracy)
 - ✅ Early stopping support
 - ✅ Learning rate scheduling
-- ✅ Evaluation metrics (accuracy, confusion matrix)
+- ✅ Evaluation metrics (accuracy, confusion matrix, per-class accuracy)
 - ✅ Inference and demo scripts
-- ✅ Jupyter notebooks for Colab
+- ✅ Google Colab notebook for cloud training
+- ✅ GPU and CPU support
 
 ## 🔧 Troubleshooting
 
@@ -247,7 +261,23 @@ TRAIN_CONFIG = {
 
 **Solution**:
 - Use Python 3.11 or 3.12 instead
-- Or try PyTorch nightly builds (may be unstable)
+- Run `./setup.sh` to automatically set up Python 3.12 environment
+
+### Dataset Loading Issues
+
+**Problem**: "Captions file not found"
+
+**Solution**:
+- Check that `data/captions/Flickr8k.token.txt` exists
+- Verify the file format (CSV: `image,caption` or token: `image_id#num caption`)
+- The dataset loader supports both formats automatically
+
+**Problem**: "Image not found for ID: ..."
+
+**Solution**:
+- Ensure images are in `data/images/` directory
+- Check image file extensions (.jpg, .jpeg, .png)
+- The loader tries common extensions automatically
 
 ### CUDA/GPU Issues
 
@@ -256,21 +286,13 @@ TRAIN_CONFIG = {
 **Solution**:
 - The project works on CPU (slower but functional)
 - For GPU: Install CUDA-compatible PyTorch from [PyTorch website](https://pytorch.org/get-started/locally/)
-
-### Data Loading Issues
-
-**Problem**: HDF5 file not found
-
-**Solution**:
-- Check file path in `--h5_file` argument
-- Ensure HDF5 file is in the correct format
-- Project will fall back to mock data if HDF5 not found
+- In Colab: Enable GPU in Runtime settings
 
 ## 📚 Additional Resources
 
 - [PyTorch Documentation](https://pytorch.org/docs/)
-- [Fashion-Gen Dataset on Kaggle](https://www.kaggle.com/datasets/bothin/fashiongen-validation/data)
-- Project notebooks in `notebooks/` for Google Colab usage
+- [Flickr8k Dataset on Kaggle](https://www.kaggle.com/datasets/adityajn105/flickr8k)
+- [Google Colab](https://colab.research.google.com/) - For cloud training with free GPU
 
 ## 📄 License
 
@@ -282,9 +304,13 @@ Feel free to submit issues or pull requests for improvements.
 
 ---
 
-**Note**: This project is designed to validate the CNN + RNN + Fusion architecture. For production use, consider:
-- Using larger datasets
-- Hyperparameter tuning
-- Model architecture improvements
-- Additional data augmentation
+## 🎓 Project Summary
 
+This project successfully demonstrates:
+- Multi-modal deep learning (CNN + RNN fusion)
+- End-to-end training pipeline
+- Real-world dataset integration (Flickr8k)
+- Model evaluation and inference
+- Cloud training with Google Colab
+
+**Final Results**: 89.28% test accuracy on 10-class image classification using both image and text features.

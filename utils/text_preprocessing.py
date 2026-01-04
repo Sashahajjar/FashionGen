@@ -1,9 +1,8 @@
 """
 Text preprocessing utilities
 
-This module contains functions for preprocessing fashion text descriptions.
-Currently contains placeholder functions. Real Fashion-Gen text preprocessing
-will be integrated later.
+This module contains functions for preprocessing text captions.
+Note: The main vocabulary implementation is in data/dataset.py (SimpleVocabulary).
 """
 
 import torch
@@ -13,14 +12,13 @@ class Vocabulary:
     """
     Vocabulary class for text tokenization.
     
-    TODO: Replace with Fashion-Gen specific vocabulary and tokenizer.
+    Note: Main implementation is in data/dataset.py (SimpleVocabulary).
+    This is a placeholder class for backward compatibility.
     """
     
     def __init__(self):
         """
         Initialize vocabulary.
-        
-        TODO: Load Fashion-Gen vocabulary from file or build from captions.
         """
         # Placeholder vocabulary
         self.word2idx = {}
@@ -34,9 +32,8 @@ class Vocabulary:
         Args:
             captions: List of caption strings
         
-        TODO: Implement real vocabulary building for Fashion-Gen captions.
+        Note: Main vocabulary building is in data/dataset.py (SimpleVocabulary).
         """
-        # TODO: Build vocabulary from Fashion-Gen captions
         pass
     
     def encode(self, caption):
@@ -49,10 +46,8 @@ class Vocabulary:
         Returns:
             List of token IDs
         
-        TODO: Implement real encoding for Fashion-Gen captions.
+        Note: Main encoding is in data/dataset.py (SimpleVocabulary).
         """
-        # TODO: Tokenize and encode Fashion-Gen caption
-        # For now, return placeholder
         return []
     
     def decode(self, token_ids):
@@ -65,10 +60,8 @@ class Vocabulary:
         Returns:
             String caption
         
-        TODO: Implement real decoding for Fashion-Gen captions.
+        Note: Main decoding is in data/dataset.py (SimpleVocabulary).
         """
-        # TODO: Decode token IDs to Fashion-Gen caption
-        # For now, return placeholder
         return ""
 
 
@@ -82,10 +75,8 @@ def create_tokenizer(vocab_size=10000):
     Returns:
         Tokenizer object
     
-    TODO: Replace with Fashion-Gen specific tokenizer (e.g., BPE, WordPiece).
+    Note: Main tokenization is handled by SimpleVocabulary in data/dataset.py.
     """
-    # TODO: Create real tokenizer for Fashion-Gen captions
-    # For now, return placeholder
     return None
 
 
@@ -100,14 +91,9 @@ def preprocess_caption(caption, max_length=50):
     Returns:
         Dictionary with 'tokens' and 'length'
     
-    TODO: Implement real preprocessing for Fashion-Gen captions.
+    Note: Main preprocessing is in data/dataset.py (Flickr8kDataset).
+    This is a placeholder function for backward compatibility.
     """
-    # TODO: Preprocess Fashion-Gen caption
-    # - Tokenize
-    # - Convert to token IDs
-    # - Pad/truncate to max_length
-    # - Return tokens and actual length
-    
     # Placeholder: return random tokens for mock data
     length = torch.randint(5, max_length + 1, (1,)).item()
     tokens = torch.randint(1, 10000, (length,))

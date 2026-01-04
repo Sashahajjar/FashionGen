@@ -2,18 +2,16 @@
 Fusion Model for Combining Image and Text Features
 
 This module implements a fusion model that combines features from CNN (images)
-and RNN (text) to create a unified representation for fashion items.
-Currently works with mock data. Real Fashion-Gen data loading will be
-integrated later.
+and RNN (text) to create a unified representation for multimodal classification.
 """
 
 import torch
 import torch.nn as nn
-from .cnn_model import FashionCNN
-from .rnn_model import FashionRNN
+from .cnn_model import ImageCNN
+from .rnn_model import TextRNN
 
 
-class FashionFusionModel(nn.Module):
+class MultimodalFusionModel(nn.Module):
     """
     Fusion model that combines image and text features.
     
@@ -24,7 +22,6 @@ class FashionFusionModel(nn.Module):
     
     Output: Combined feature vector of shape (B, output_dim)
     
-    TODO: Replace mock data with real Fashion-Gen image and caption loading
     """
     
     def __init__(
@@ -47,14 +44,14 @@ class FashionFusionModel(nn.Module):
             fusion_method: Method to fuse features ('concat', 'add', 'multiply')
             num_classes: Number of classification classes
         """
-        super(FashionFusionModel, self).__init__()
+        super(MultimodalFusionModel, self).__init__()
         self.fusion_method = fusion_method
         self.num_classes = num_classes
         
         # Initialize CNN and RNN models
         # TODO: Load pretrained weights when real data is available
-        self.cnn = FashionCNN(feature_dim=cnn_feature_dim, pretrained=True)
-        self.rnn = FashionRNN(feature_dim=rnn_feature_dim)
+        self.cnn = ImageCNN(feature_dim=cnn_feature_dim, pretrained=True)
+        self.rnn = TextRNN(feature_dim=rnn_feature_dim)
         
         # Store freeze_cnn flag for later use
         self._freeze_cnn = False
@@ -90,14 +87,8 @@ class FashionFusionModel(nn.Module):
         
         Args:
             images: Tensor of shape (B, 3, 224, 224)
-                   Currently accepts random tensors for mock data
-                   TODO: Replace with real Fashion-Gen images
             token_ids: Tensor of shape (B, seq_len)
-                     Currently accepts random token IDs for mock data
-                     TODO: Replace with real Fashion-Gen caption tokens
             lengths: Tensor of shape (B,)
-                    Currently accepts random lengths for mock data
-                    TODO: Replace with real Fashion-Gen caption lengths
         
         Returns:
             fused_features: Tensor of shape (B, output_dim)
@@ -171,9 +162,9 @@ def create_fusion_model(
         num_classes: Number of classification classes
     
     Returns:
-        FashionFusionModel instance
+        MultimodalFusionModel instance
     """
-    return FashionFusionModel(
+    return MultimodalFusionModel(
         cnn_feature_dim=cnn_feature_dim,
         rnn_feature_dim=rnn_feature_dim,
         fusion_dim=fusion_dim,
