@@ -1,5 +1,5 @@
 """
-Inference/Demo script for Fashion-Gen model
+Inference/Demo script for Flickr8k model
 
 This script performs inference using the trained model.
 Takes an image and text description and outputs predictions.
@@ -15,14 +15,15 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from models.fusion_model import create_fusion_model
+from data.dataset import Flickr8kDataset
 from training.config import MODEL_CONFIG, TRAIN_CONFIG, PATHS
 from training.train_utils import load_checkpoint
 
 
-# Mock class names (replace with real Fashion-Gen categories)
+# Class names based on Flickr8k caption keywords
 CLASS_NAMES = [
-    'T-Shirt', 'Trouser', 'Pullover', 'Dress', 'Coat',
-    'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle Boot'
+    'Dog', 'Cat', 'Person', 'Vehicle', 'Water',
+    'Building', 'Tree', 'Food', 'Sport', 'Sky'
 ]
 
 
@@ -121,12 +122,10 @@ def print_prediction(prediction, true_label=None, class_names=None):
 
 def demo():
     """
-    Demo function that runs inference on mock data.
-    
-    TODO: Replace with real image and caption loading.
+    Demo function that runs inference on Flickr8k test data.
     """
     print("=" * 80)
-    print("Fashion-Gen Inference Demo")
+    print("Flickr8k Inference Demo")
     print("=" * 80)
     
     # Set device
@@ -158,29 +157,61 @@ def demo():
         print("Using randomly initialized model.")
         num_classes = MODEL_CONFIG['num_classes']
     
+    # Load vocabulary from training data
+    print("\nLoading vocabulary...")
+    images_dir = PATHS['images_dir']
+    captions_file = PATHS['captions_file']
+    
+    train_dataset_for_vocab = Flickr8kDataset(
+        images_dir=images_dir,
+        captions_file=captions_file,
+        image_size=TRAIN_CONFIG['image_size'],
+        max_seq_len=TRAIN_CONFIG['max_seq_len'],
+        vocab_size=MODEL_CONFIG['vocab_size'],
+        split='train',
+        build_vocab=True,
+        num_classes=MODEL_CONFIG['num_classes'],
+        train_split=TRAIN_CONFIG['train_split'],
+        val_split=TRAIN_CONFIG['val_split']
+    )
+    vocab = train_dataset_for_vocab.vocab
+    
+    # Load test dataset
+    print("Loading test dataset...")
+    test_dataset = Flickr8kDataset(
+        images_dir=images_dir,
+        captions_file=captions_file,
+        image_size=TRAIN_CONFIG['image_size'],
+        max_seq_len=TRAIN_CONFIG['max_seq_len'],
+        vocab_size=MODEL_CONFIG['vocab_size'],
+        split='test',
+        build_vocab=False,
+        vocab=vocab,
+        num_classes=MODEL_CONFIG['num_classes'],
+        train_split=TRAIN_CONFIG['train_split'],
+        val_split=TRAIN_CONFIG['val_split']
+    )
+    
     # Run inference on a few examples
     print("\n" + "=" * 80)
-    print("Running Inference on Mock Examples")
+    print("Running Inference on Test Examples")
     print("=" * 80)
     
-    num_examples = 3
+    num_examples = min(3, len(test_dataset))
     for example_idx in range(num_examples):
         print(f"\n{'=' * 80}")
         print(f"Example {example_idx + 1}/{num_examples}")
         print(f"{'=' * 80}")
         
-        # Create mock input
-        # TODO: Replace with real image and caption loading
-        image = torch.rand(1, 3, 224, 224)  # Single image
-        seq_len = np.random.randint(10, 30)
-        caption_tokens = torch.randint(1, MODEL_CONFIG['vocab_size'], (1, seq_len))
-        caption_length = torch.tensor([seq_len])
+        # Get sample from test dataset
+        sample = test_dataset[example_idx]
+        image = sample['image'].unsqueeze(0)  # Add batch dimension
+        caption_tokens = sample['caption_tokens'].unsqueeze(0)
+        caption_length = torch.tensor([sample['caption_length']])
+        true_label = sample['label']
         
-        # Generate random true label for demo
-        true_label = np.random.randint(0, num_classes)
-        
-        print(f"Image: Random tensor (224x224x3)")
-        print(f"Caption: Random tokens (length: {seq_len})")
+        print(f"Image ID: {sample['image_id']}")
+        print(f"Caption: {sample['caption_text']}")
         print(f"True Label: {CLASS_NAMES[true_label] if true_label < len(CLASS_NAMES) else f'Class {true_label}'} (Class {true_label})")
         
         # Make prediction
@@ -194,8 +225,6 @@ def demo():
     print("\n" + "=" * 80)
     print("Demo Complete!")
     print("=" * 80)
-    print("\nNote: This was a test run with mock data.")
-    print("TODO: Replace with real Fashion-Gen image and caption loading.")
 
 
 if __name__ == '__main__':

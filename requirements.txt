@@ -7,7 +7,6 @@ torchvision>=0.15.0
 
 # Data Processing
 numpy>=1.21.0,<2.0  # PyTorch requires NumPy < 2.0
-h5py>=3.7.0
 Pillow>=9.0.0
 
 # Machine Learning Utilities
@@ -16,6 +15,6 @@ scikit-learn>=1.0.0
 # Visualization
 matplotlib>=3.5.0
 
-# Optional: For downloading Fashion-Gen dataset from Kaggle
+# Optional: For downloading Flickr8k dataset from Kaggle
 # kaggle>=1.5.0
 

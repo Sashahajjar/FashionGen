@@ -9,6 +9,7 @@ will be integrated later.
 import torch
 import torch.nn as nn
 import torchvision.models as models
+from torchvision.models import ResNet50_Weights
 
 
 class FashionCNN(nn.Module):
@@ -34,7 +35,10 @@ class FashionCNN(nn.Module):
         
         # Use ResNet50 as backbone (can be changed to other architectures)
         # TODO: Replace with Fashion-Gen specific architecture if needed
-        resnet = models.resnet50(pretrained=pretrained)
+        if pretrained:
+            resnet = models.resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
+        else:
+            resnet = models.resnet50(weights=None)
         
         # Remove the final classification layer
         self.backbone = nn.Sequential(*list(resnet.children())[:-1])

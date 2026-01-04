@@ -13,7 +13,7 @@ MODEL_CONFIG = {
     'fusion_method': 'concat',  # 'concat', 'add', or 'multiply'
     
     # Classification
-    'num_classes': 10,  # Number of clothing categories (mock: 10 classes)
+    'num_classes': 10,  # Number of image categories (based on caption keywords)
     
     # RNN specific
     'vocab_size': 10000,
@@ -53,10 +53,9 @@ TRAIN_CONFIG = {
     'image_size': (224, 224),
     'max_seq_len': 50,
     
-    # For mock data only (ignored when real HDF5 data is loaded)
-    'num_train_samples': 32,  # Mock data only
-    'num_val_samples': 8,  # Mock data only
-    'val_split': 0.2,  # Validation split ratio
+    # Dataset split ratios (for Flickr8k)
+    'train_split': 0.7,  # Training split ratio
+    'val_split': 0.15,   # Validation split ratio (test gets the rest)
     
     # Training settings
     'device': 'cuda' if __import__('torch').cuda.is_available() else 'cpu',
@@ -81,10 +80,10 @@ TRAIN_CONFIG = {
     'save_best': True,  # Save best model based on validation loss
 }
 
-# Paths (TODO: Update with real Fashion-Gen paths)
+# Paths for Flickr8k dataset
 PATHS = {
-    'images_dir': 'data/images',
-    'captions_dir': 'data/captions',
+    'images_dir': 'data/images',  # Directory containing Flickr8k images
+    'captions_file': 'data/captions/Flickr8k.token.txt',  # Path to captions file
     'processed_dir': 'data/processed',
     'saved_models_dir': 'saved_models',
 }

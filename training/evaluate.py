@@ -1,9 +1,7 @@
 """
-Evaluation script for Fashion-Gen model
+Evaluation script for Flickr8k model
 
 This script evaluates the trained model on test data.
-Currently contains placeholder functions. Real Fashion-Gen evaluation
-will be integrated later.
 """
 
 import torch
@@ -17,7 +15,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from models.fusion_model import create_fusion_model
-from data.dataset import FashionGenDataset, create_dataloader
+from data.dataset import Flickr8kDataset, create_dataloader
 from training.config import MODEL_CONFIG, TRAIN_CONFIG, PATHS
 from training.train_utils import load_checkpoint
 
@@ -127,25 +125,52 @@ def print_evaluation_results(metrics, num_classes, class_names=None):
 def main():
     """
     Main evaluation function.
-    
-    TODO: Replace with real Fashion-Gen evaluation pipeline.
     """
     print("=" * 80)
-    print("Fashion-Gen Model Evaluation")
+    print("Flickr8k Model Evaluation")
     print("=" * 80)
     
     # Set device
     device = torch.device(TRAIN_CONFIG['device'])
     print(f"Device: {device}")
     
-    # Create test dataset and dataloader
-    print("\nCreating test dataset with mock data...")
-    test_dataset = FashionGenDataset(
+    # Get paths from config
+    images_dir = PATHS['images_dir']
+    captions_file = PATHS['captions_file']
+    
+    print(f"\nImages directory: {images_dir}")
+    print(f"Captions file: {captions_file}")
+    
+    # Build vocabulary from training data first (to match training)
+    print("\nBuilding vocabulary from training data...")
+    train_dataset_for_vocab = Flickr8kDataset(
+        images_dir=images_dir,
+        captions_file=captions_file,
         image_size=TRAIN_CONFIG['image_size'],
         max_seq_len=TRAIN_CONFIG['max_seq_len'],
         vocab_size=MODEL_CONFIG['vocab_size'],
-        num_samples=100,  # Test samples
-        num_classes=MODEL_CONFIG['num_classes']
+        split='train',
+        build_vocab=True,
+        num_classes=MODEL_CONFIG['num_classes'],
+        train_split=TRAIN_CONFIG['train_split'],
+        val_split=TRAIN_CONFIG['val_split']
+    )
+    vocab = train_dataset_for_vocab.vocab
+    
+    # Create test dataset and dataloader
+    print("\nCreating test dataset...")
+    test_dataset = Flickr8kDataset(
+        images_dir=images_dir,
+        captions_file=captions_file,
+        image_size=TRAIN_CONFIG['image_size'],
+        max_seq_len=TRAIN_CONFIG['max_seq_len'],
+        vocab_size=MODEL_CONFIG['vocab_size'],
+        split='test',
+        build_vocab=False,
+        vocab=vocab,
+        num_classes=MODEL_CONFIG['num_classes'],
+        train_split=TRAIN_CONFIG['train_split'],
+        val_split=TRAIN_CONFIG['val_split']
     )
     
     test_dataloader = create_dataloader(
@@ -194,8 +219,7 @@ def main():
     # Print results
     print_evaluation_results(metrics, num_classes)
     
-    print("\nNote: This was a test run with mock data.")
-    print("TODO: Replace with real Fashion-Gen evaluation metrics.")
+    print("\nEvaluation complete!")
 
 
 if __name__ == '__main__':
