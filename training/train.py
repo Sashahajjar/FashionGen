@@ -117,17 +117,18 @@ def validate(model, dataloader, criterion, device):
     return avg_loss, accuracy
 
 
-def train(early_stop=None, max_samples=None, h5_file_path=None):
+def train(early_stop=None, max_samples=None, h5_file_path=None, h5_train_path=None, h5_val_path=None):
     """
     Main training function.
     
     Args:
         early_stop: If True, enable early stopping. If None, use config default.
         max_samples: Maximum number of samples to use from dataset (None = use all)
-        h5_file_path: Path to HDF5 file (None = auto-detect or use mock data)
+        h5_file_path: Path to single HDF5 file (deprecated - use h5_train_path and h5_val_path)
+        h5_train_path: Path to training HDF5 file (preferred)
+        h5_val_path: Path to validation HDF5 file (preferred)
     
-    Currently runs with mock data for testing.
-    TODO: Replace with full training loop using real Fashion-Gen data.
+    FashionGen provides separate train and validation files - use h5_train_path and h5_val_path.
     """
     # Override early stopping if provided via command line
     if early_stop is not None:
@@ -143,10 +144,40 @@ def train(early_stop=None, max_samples=None, h5_file_path=None):
     print(f"Number of classes: {MODEL_CONFIG['num_classes']}")
     
     # Create train and validation datasets
-    if h5_file_path:
-        print("\nCreating datasets from HDF5 file...")
-        # Use real HDF5 data - same file, split into train/val
-        # The dataset class handles splitting internally
+    # FashionGen provides separate train and validation files
+    if h5_train_path and h5_val_path:
+        print("\nCreating datasets from separate train/val HDF5 files...")
+        print(f"Training file: {h5_train_path}")
+        print(f"Validation file: {h5_val_path}")
+        
+        train_dataset = FashionGenDataset(
+            image_size=TRAIN_CONFIG['image_size'],
+            max_seq_len=TRAIN_CONFIG['max_seq_len'],
+            vocab_size=MODEL_CONFIG['vocab_size'],
+            num_samples=TRAIN_CONFIG['num_train_samples'],
+            num_classes=MODEL_CONFIG['num_classes'],
+            h5_file_path=h5_train_path,
+            split='train',
+            use_mock_data=False,
+            max_samples=max_samples
+        )
+        
+        val_dataset = FashionGenDataset(
+            image_size=TRAIN_CONFIG['image_size'],
+            max_seq_len=TRAIN_CONFIG['max_seq_len'],
+            vocab_size=MODEL_CONFIG['vocab_size'],
+            num_samples=TRAIN_CONFIG['num_val_samples'],
+            num_classes=MODEL_CONFIG['num_classes'],
+            h5_file_path=h5_val_path,
+            split='val',
+            use_mock_data=False,
+            max_samples=max_samples
+        )
+    elif h5_file_path:
+        # Legacy support: single file (not recommended)
+        print("\n⚠️  WARNING: Using single HDF5 file for both train and val.")
+        print("⚠️  FashionGen provides separate train/val files - this is not recommended.")
+        print("⚠️  Use --h5_train and --h5_val instead.")
         
         train_dataset = FashionGenDataset(
             image_size=TRAIN_CONFIG['image_size'],
@@ -157,7 +188,7 @@ def train(early_stop=None, max_samples=None, h5_file_path=None):
             h5_file_path=h5_file_path,
             split='train',
             use_mock_data=False,
-            max_samples=max_samples  # Will use 80% for train
+            max_samples=max_samples
         )
         
         val_dataset = FashionGenDataset(
@@ -169,7 +200,7 @@ def train(early_stop=None, max_samples=None, h5_file_path=None):
             h5_file_path=h5_file_path,
             split='val',
             use_mock_data=False,
-            max_samples=max_samples  # Will use 20% for val
+            max_samples=max_samples
         )
     else:
         print("\nCreating datasets with mock data...")
@@ -456,9 +487,15 @@ if __name__ == '__main__':
     parser.add_argument('--max_samples', type=int, default=None,
                         help='Maximum number of samples to use from dataset (for Colab/subset training)')
     parser.add_argument('--h5_file', type=str, default=None,
-                        help='Path to HDF5 file (if None, auto-detect or use mock data)')
+                        help='Path to single HDF5 file (deprecated - use --h5_train and --h5_val)')
+    parser.add_argument('--h5_train', type=str, default=None,
+                        help='Path to training HDF5 file (preferred)')
+    parser.add_argument('--h5_val', type=str, default=None,
+                        help='Path to validation HDF5 file (preferred)')
     args = parser.parse_args()
     
     train(early_stop=args.early_stop if args.early_stop else None,
           max_samples=args.max_samples,
-          h5_file_path=args.h5_file)
+          h5_file_path=args.h5_file,
+          h5_train_path=args.h5_train,
+          h5_val_path=args.h5_val)

@@ -80,28 +80,18 @@ class FashionGenH5Dataset(Dataset):
             first_key = list(self.h5_file.keys())[0]
             full_size = len(self.h5_file[first_key])
         
-        # Store original size for train/val splitting
+        # Use entire file - no internal splitting
+        # FashionGen provides separate train/val files, so we use the whole file
         self.full_size = full_size
         self.max_samples = max_samples if max_samples else full_size
         self.split = split
         
-        # Calculate actual dataset size based on split
-        if split == 'train':
-            # Training: use first 80%
-            if max_samples:
-                self.num_samples = int(max_samples * 0.8)
-            else:
-                self.num_samples = int(full_size * 0.8)
-        else:  # val or test
-            # Validation: use last 20%
-            if max_samples:
-                self.num_samples = max_samples - int(max_samples * 0.8)
-            else:
-                self.num_samples = full_size - int(full_size * 0.8)
-        
+        # Use entire file (no splitting)
         if max_samples and max_samples < full_size:
+            self.num_samples = max_samples
             print(f"Using {self.num_samples} samples for {split} split (from {max_samples} max, {full_size} total)")
         else:
+            self.num_samples = full_size
             print(f"Using {self.num_samples} samples for {split} split (from {full_size} total)")
         
         # Build vocabulary from captions
@@ -284,30 +274,12 @@ class FashionGenH5Dataset(Dataset):
     
     def __getitem__(self, idx):
         """Get a sample from the dataset."""
-        # Handle train/val split: use first 80% for train, last 20% for val
-        if self.split == 'val':
-            # Validation: use last portion of dataset
-            if self.max_samples < self.full_size:
-                # If max_samples set, use last portion
-                train_size = int(self.max_samples * 0.8)
-                offset = train_size
-            else:
-                # Use last 20% of full dataset
-                offset = int(self.full_size * 0.8)
-            actual_idx = offset + idx
-            # Ensure we don't go out of bounds
-            if actual_idx >= self.full_size:
-                actual_idx = self.full_size - 1
-        else:
-            # Training: use first portion
-            actual_idx = idx
-            # Ensure we stay within train portion
-            if self.max_samples < self.full_size:
-                max_train_idx = int(self.max_samples * 0.8)
-            else:
-                max_train_idx = int(self.full_size * 0.8)
-            if actual_idx >= max_train_idx:
-                actual_idx = max_train_idx - 1
+        # Use entire file - no splitting
+        # FashionGen provides separate train/val files
+        actual_idx = idx
+        # Ensure we don't go out of bounds
+        if actual_idx >= self.full_size:
+            actual_idx = self.full_size - 1
         
         # Get image
         image = self._get_image(actual_idx)
