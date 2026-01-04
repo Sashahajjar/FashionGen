@@ -245,9 +245,11 @@ class Flickr8kDataset(Dataset):
     
     def _load_captions(self) -> List[Dict[str, str]]:
         """
-        Load captions from Flickr8k.token.txt file.
+        Load captions from Flickr8k captions file.
         
-        Format: image_id#caption_number caption_text
+        Supports multiple formats:
+        - CSV: image,caption
+        - Token format: image_id#caption_number caption_text
         Returns: List of dicts with 'image_id' and 'caption'
         """
         image_caption_pairs = []
@@ -256,28 +258,51 @@ class Flickr8kDataset(Dataset):
             raise FileNotFoundError(f"Captions file not found: {self.captions_file}")
         
         with open(self.captions_file, 'r', encoding='utf-8') as f:
-            for line in f:
+            first_line = f.readline().strip()
+            f.seek(0)  # Reset to beginning
+            
+            # Check if CSV format (has header like "image,caption")
+            is_csv = first_line.lower().startswith('image') and ',' in first_line
+            
+            for line_num, line in enumerate(f):
                 line = line.strip()
                 if not line:
                     continue
                 
-                # Parse format: image_id#caption_number caption_text
-                # Example: 1000268201_693b08cb0e#0	A child in a pink dress is climbing up a set of stairs in an entry way .
-                parts = line.split('\t', 1)
-                if len(parts) != 2:
-                    # Try space split as fallback
-                    parts = line.split(' ', 1)
+                # Skip CSV header
+                if is_csv and line_num == 0:
+                    continue
+                
+                if is_csv:
+                    # Parse CSV format: image,caption
+                    # Example: 1000268201_693b08cb0e.jpg,A child in a pink dress...
+                    parts = line.split(',', 1)
                     if len(parts) != 2:
                         continue
-                
-                image_caption_id = parts[0].strip()
-                caption_text = parts[1].strip()
-                
-                # Extract image_id (remove #caption_number)
-                if '#' in image_caption_id:
-                    image_id = image_caption_id.split('#')[0]
+                    
+                    image_filename = parts[0].strip()
+                    caption_text = parts[1].strip()
+                    
+                    # Remove .jpg extension to get image_id
+                    image_id = image_filename.replace('.jpg', '').replace('.jpeg', '').replace('.png', '')
                 else:
-                    image_id = image_caption_id
+                    # Parse token format: image_id#caption_number caption_text
+                    # Example: 1000268201_693b08cb0e#0	A child in a pink dress...
+                    parts = line.split('\t', 1)
+                    if len(parts) != 2:
+                        # Try space split as fallback
+                        parts = line.split(' ', 1)
+                        if len(parts) != 2:
+                            continue
+                    
+                    image_caption_id = parts[0].strip()
+                    caption_text = parts[1].strip()
+                    
+                    # Extract image_id (remove #caption_number)
+                    if '#' in image_caption_id:
+                        image_id = image_caption_id.split('#')[0]
+                    else:
+                        image_id = image_caption_id
                 
                 image_caption_pairs.append({
                     'image_id': image_id,
