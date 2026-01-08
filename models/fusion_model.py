@@ -49,7 +49,6 @@ class MultimodalFusionModel(nn.Module):
         self.num_classes = num_classes
         
         # Initialize CNN and RNN models
-        # TODO: Load pretrained weights when real data is available
         self.cnn = ImageCNN(feature_dim=cnn_feature_dim, pretrained=True)
         self.rnn = TextRNN(feature_dim=rnn_feature_dim)
         

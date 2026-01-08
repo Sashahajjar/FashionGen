@@ -87,8 +87,10 @@ class TextRNN(nn.Module):
         embedded = self.embedding(token_ids)
         
         # Pack sequences for efficient processing
+        # Note: lengths must be on CPU for pack_padded_sequence
+        lengths_cpu = lengths.cpu()
         packed = nn.utils.rnn.pack_padded_sequence(
-            embedded, lengths, batch_first=True, enforce_sorted=False
+            embedded, lengths_cpu, batch_first=True, enforce_sorted=False
         )
         
         # Pass through RNN

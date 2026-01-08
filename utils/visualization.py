@@ -19,10 +19,9 @@ def visualize_batch(images, captions=None, num_samples=4):
         captions: Optional list of caption strings
         num_samples: Number of samples to visualize
     
-    TODO: Add Flickr8k specific visualization.
+    Note: This is a placeholder function for future visualization enhancements.
     """
-    # TODO: Implement visualization for Flickr8k images and captions
-    # For now, this is a placeholder
+    # Placeholder for visualization implementation
     pass
 
 
@@ -34,8 +33,6 @@ def plot_training_curves(train_losses, val_losses=None, save_path=None):
         train_losses: List of training losses
         val_losses: Optional list of validation losses
         save_path: Optional path to save the plot
-    
-    TODO: Add more metrics (accuracy, recall, etc.) when real data is available.
     """
     plt.figure(figsize=(10, 6))
     plt.plot(train_losses, label='Train Loss')
